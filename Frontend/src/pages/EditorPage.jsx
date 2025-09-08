@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useParams, useLocation, Link } from "react-router-dom";
 import Client from "../Components/Client";
 import CodeEditor from "../Components/CodeEditor";
 // import { useUserContext } from "../context/user";
@@ -35,38 +35,38 @@ const EditorPage = () => {
 
       //Joined
 
-
-      socketRef.current.on( Actions.JOINED, ({ clients : newClients, username, socketId }) => {
-        // console.log(`${username} ${socketId}`);
-        if (username !== location.state?.userName) {
-          toast.success(`${username} joined the room`);
+      socketRef.current.on(
+        Actions.JOINED,
+        ({ clients: newClients, username, socketId }) => {
+          // console.log(`${username} ${socketId}`);
+          if (username !== location.state?.userName) {
+            toast.success(`${username} joined the room`);
+          }
+          setClients(newClients);
+          if (codeRef.current) {
+            socketRef.current.emit(Actions.SYNC_CODE, {
+              code: codeRef.current,
+              socketId,
+            });
+          }
         }
-        setClients(newClients);
-        if(codeRef.current){
-          socketRef.current.emit(Actions.SYNC_CODE , {
-            code : codeRef.current,
-            socketId
-          })
-        }
-      });
+      );
 
-
-      socketRef.current.on( Actions.DISCONNECTED, ({ username, socketId }) => {
+      socketRef.current.on(Actions.DISCONNECTED, ({ username, socketId }) => {
         toast.success(`${username} left the room`);
-        setClients((prevClients) => prevClients.filter(client => client.socketId !== socketId));
+        setClients((prevClients) =>
+          prevClients.filter((client) => client.socketId !== socketId)
+        );
       });
-
-
-
     }
     init();
     // whaterver we return in useEffect is called when component unmounts or cleanup function
-    return ()=>{
+    return () => {
       socketRef.current.disconnect();
       socketRef.current.off(Actions.JOINED);
       socketRef.current.off(Actions.DISCONNECTED);
-    }
-   }, []);
+    };
+  }, []);
 
   const handleCopy = async () => {
     try {
@@ -83,12 +83,15 @@ const EditorPage = () => {
   return (
     <div className="flex">
       {/* Sidebar */}
-      <div className="aside w-[15%]  text-white bg-gray-900 h-screen  flex flex-col justify-between">
+      <div className="aside w-[15%]  text-white bg-[#0b132b] h-screen  flex flex-col justify-between">
         <div className="asideInner">
-          <h2 className="text-2xl font-bold text-white p-4 border-b border-gray-700">
-            CodeEditor
-          </h2>
-          <p className="px-4 text-md text-gray-100 mt-2">Connected</p>
+          <Link to="/">
+            <div className="logo flex gap-2 items-center p-4">
+              <img src="/code.png" alt="logo" className="w-10" />
+              <h3 className="text-center text-2xl font-bold">CodeDrip</h3>
+            </div>
+          </Link>
+          <p className="px-4 text-md text-gray-100 mt-2">Connected Clients</p>
 
           <div className="clients-list mt-4 flex flex-wrap gap-2 max-h-120 overflow-y-auto pr-2 scrollbar-thin">
             {clients.map((client) => (
@@ -106,7 +109,7 @@ const EditorPage = () => {
             Copy room ID
           </button>
           <button
-            className="px-6 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition cursor-pointer"
+            className="px-6 py-2 bg-[#00377e] text-white rounded-md font-semibold hover:bg-[#002a61] transition cursor-pointer"
             onClick={handleLeave}
           >
             Leave
@@ -115,7 +118,11 @@ const EditorPage = () => {
       </div>
 
       <div className="Editor flex-1 h-screen text-gray-200 max-h-screen overflow-y-auto scrollbar-thin">
-        <CodeEditor socketRef={socketRef} roomId={id} onCodeChange={(code)=> codeRef.current = code} />
+        <CodeEditor
+          socketRef={socketRef}
+          roomId={id}
+          onCodeChange={(code) => (codeRef.current = code)}
+        />
       </div>
     </div>
   );

@@ -68,9 +68,9 @@ const Home = () => {
               Join Room
             </button>
             <p className=" text-gray-400 mt-1 mx-auto cursor-pointer">
-              don't have an invite,create a &nbsp;
+              don't have an invite, create a &nbsp;
               <span className="text-blue-500 underline" onClick={createNewRoom}>
-                new room
+                new-room
               </span>
             </p>
           </div>

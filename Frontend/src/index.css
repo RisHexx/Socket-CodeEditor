@@ -1,18 +1,36 @@
 @import "tailwindcss";
+
+/* Smooth transitions globally */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Better font rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* Thin scrollbar */
 .scrollbar-thin::-webkit-scrollbar {
-  width: 6px;              /* very thin */
+  width: 6px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent; /* no track background */
+  background: transparent;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3); /* subtle white/gray */
-  border-radius: 9999px;                      /* fully rounded */
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 9999px;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.5); /* slightly brighter on hover */
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(0, 55, 126, 0.5);
+  color: #fff;
 }

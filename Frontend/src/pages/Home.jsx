@@ -36,41 +36,42 @@ const Home = () => {
   };
   return (
     <>
-      <div className="h-screen flex justify-center items-center bg-[#0b132b]">
-        <div className="w-100 bg-[#1c2541] shadow-lg rounded-2xl p-6">
-          <div className="logo flex gap-2 items-center p-4">
-            <img src="/code.png" alt="logo" className="w-10" />
-            <h3 className="text-center text-white text-2xl font-bold">
+      <div className="min-h-screen flex justify-center items-center bg-[#0b132b] px-4 py-8">
+        <div className="w-full max-w-md bg-[#1c2541] shadow-2xl rounded-2xl p-8 border border-[#3a506b]/30">
+          <div className="logo flex gap-3 items-center justify-center mb-2">
+            <img src="/code.png" alt="logo" className="w-12 drop-shadow-lg" />
+            <h3 className="text-white text-3xl font-bold tracking-tight">
               CodeDrip
             </h3>
           </div>
-          <div className="mt-6 space-y-4">
+          <p className="text-center text-gray-400 text-sm mb-6">Real-time collaborative code editor</p>
+          <div className="space-y-4">
             <input
               type="text"
               value={roomId}
               onChange={(e) => setRoomId(e.target.value)}
-              placeholder="Enter Room Id"
+              placeholder="Enter Room ID"
               onKeyUp={handelEnterKey}
-              className="w-full px-4 py-2 bg-[#3a506b] border border-[#3a506b] rounded-lg text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-[#31435a] hover:border-[#31435a]"
+              className="w-full px-4 py-3 bg-[#3a506b] border border-[#3a506b] rounded-lg text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-[#31435a]"
             />
             <input
               type="text"
-              placeholder="UserName"
+              placeholder="Your Username"
               value={userName}
               onKeyUp={handelEnterKey}
               onChange={(e) => setUserName(e.target.value)}
-              className="w-full px-4 py-2 bg-[#3a506b] border border-[#3a506b] rounded-lg text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-[#31435a] hover:border-[#31435a]"
+              className="w-full px-4 py-3 bg-[#3a506b] border border-[#3a506b] rounded-lg text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-[#31435a]"
             />
             <button
-              className="w-full bg-[#00377e] text-white py-2 rounded-lg hover:bg-[#002a61] transition cursor-pointer"
+              className="w-full bg-[#00377e] text-white py-3 rounded-lg font-semibold hover:bg-[#004ba0] active:scale-[0.98] transition-all cursor-pointer shadow-lg hover:shadow-xl"
               onClick={joinRoom}
             >
               Join Room
             </button>
-            <p className=" text-gray-400 mt-1 mx-auto cursor-pointer">
-              don't have an invite, create a &nbsp;
-              <span className="text-blue-500 underline" onClick={createNewRoom}>
-                new-room
+            <p className="text-gray-400 text-sm text-center pt-2">
+              Don't have an invite?{" "}
+              <span className="text-blue-400 hover:text-blue-300 underline cursor-pointer" onClick={createNewRoom}>
+                Create new room
               </span>
             </p>
           </div>

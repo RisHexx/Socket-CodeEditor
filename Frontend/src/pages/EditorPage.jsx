@@ -14,16 +14,28 @@ const EditorPage = () => {
   const codeRef = useRef(null);
   const navigate = useNavigate();
   // const { userName } = useUserContext();
-  if (!location.state) {
-    return navigate("/");
-  }
+  
+  // BUG FIX: useState must be called before any conditional returns (React hooks rules)
+  // Moved useState above the redirect check to prevent "Rendered fewer hooks than expected" error
   const [clients, setClients] = useState([]);
 
+  // BUG FIX: Redirect in useEffect instead of render phase to avoid React warnings
+  useEffect(() => {
+    if (!location.state) {
+      navigate("/");
+    }
+  }, [location.state, navigate]);
+
   const handleErr = (err) => {
-    console.log("Socket Error : ", err), toast.error("Error While Connecting");
+    console.log("Socket Error : ", err);
+    // BUG FIX: Separated statements properly (comma operator was being used incorrectly)
+    toast.error("Error While Connecting");
     navigate("/");
   };
+
   useEffect(() => {
+    // BUG FIX: Early return if no location state to prevent socket initialization without username
+    if (!location.state) return;
     async function init() {
       socketRef.current = await initSocket();
       socketRef.current.on("connect_error", (err) => handleErr(err));
@@ -62,9 +74,13 @@ const EditorPage = () => {
     init();
     // whaterver we return in useEffect is called when component unmounts or cleanup function
     return () => {
-      socketRef.current.disconnect();
-      socketRef.current.off(Actions.JOINED);
-      socketRef.current.off(Actions.DISCONNECTED);
+      // BUG FIX: Check if socket exists before cleanup to prevent errors
+      // Also removed event listeners BEFORE disconnecting (correct order)
+      if (socketRef.current) {
+        socketRef.current.off(Actions.JOINED);
+        socketRef.current.off(Actions.DISCONNECTED);
+        socketRef.current.disconnect();
+      }
     };
   }, []);
 
@@ -81,19 +97,21 @@ const EditorPage = () => {
     navigate("/");
   };
   return (
-    <div className="flex">
+    <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
-      <div className="aside w-[15%]  text-white bg-[#0b132b] h-screen  flex flex-col justify-between">
-        <div className="asideInner">
-          <Link to="/">
-            <div className="logo flex gap-2 items-center p-4">
-              <img src="/code.png" alt="logo" className="w-10" />
-              <h3 className="text-center text-2xl font-bold">CodeDrip</h3>
+      <div className="aside w-[220px] min-w-[200px] text-white bg-[#0b132b] h-screen flex flex-col justify-between border-r border-[#1c2541]">
+        <div className="asideInner flex-1 overflow-hidden flex flex-col">
+          <Link to="/" className="hover:opacity-90">
+            <div className="logo flex gap-2 items-center p-4 border-b border-[#1c2541]">
+              <img src="/code.png" alt="logo" className="w-9" />
+              <h3 className="text-xl font-bold tracking-tight">CodeDrip</h3>
             </div>
           </Link>
-          <p className="px-4 text-md text-gray-100 mt-2">Connected Clients</p>
+          <div className="px-4 py-3">
+            <p className="text-xs uppercase tracking-wider text-gray-400 font-medium">Connected ({clients.length})</p>
+          </div>
 
-          <div className="clients-list mt-4 flex flex-wrap gap-2 max-h-120 overflow-y-auto pr-2 scrollbar-thin">
+          <div className="clients-list flex-1 px-3 flex flex-wrap content-start gap-2 overflow-y-auto scrollbar-thin">
             {clients.map((client) => (
               <Client key={client.socketId} username={client.username} />
             ))}
@@ -101,15 +119,15 @@ const EditorPage = () => {
         </div>
 
         {/* Bottom Buttons */}
-        <div className="flex flex-col gap-3 p-4">
+        <div className="flex flex-col gap-2 p-4 border-t border-[#1c2541]">
           <button
-            className="px-6 py-2 bg-gray-100 text-black rounded-md font-semibold hover:bg-gray-200 transition cursor-pointer"
+            className="w-full py-2.5 bg-white/90 text-gray-900 rounded-lg font-medium hover:bg-white active:scale-[0.98] transition-all cursor-pointer text-sm"
             onClick={handleCopy}
           >
-            Copy room ID
+            Copy Room ID
           </button>
           <button
-            className="px-6 py-2 bg-[#00377e] text-white rounded-md font-semibold hover:bg-[#002a61] transition cursor-pointer"
+            className="w-full py-2.5 bg-red-500/90 text-white rounded-lg font-medium hover:bg-red-500 active:scale-[0.98] transition-all cursor-pointer text-sm"
             onClick={handleLeave}
           >
             Leave
@@ -117,7 +135,7 @@ const EditorPage = () => {
         </div>
       </div>
 
-      <div className="Editor flex-1 h-screen text-gray-200 max-h-screen overflow-y-auto scrollbar-thin">
+      <div className="Editor flex-1 h-screen text-gray-200 max-h-screen overflow-y-auto scrollbar-thin bg-[#272822]">
         <CodeEditor
           socketRef={socketRef}
           roomId={id}

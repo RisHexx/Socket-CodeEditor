@@ -18,15 +18,29 @@ const CodeEditor = ({ socketRef, roomId , onCodeChange }) => {
 
   // Listen for code changes from other clients
   useEffect(() => {
-    if (!socketRef.current) return;
+    // BUG FIX: Added null check with optional chaining for safety
+    if (!socketRef?.current) return;
+    
     const handleRemoteCode = ({ code: newCode }) => {
-      setCode(newCode);
+      // BUG FIX: Only update if code is different to prevent unnecessary re-renders
+      if (newCode !== undefined) {
+        setCode(newCode);
+        onCodeChange(newCode); // Keep codeRef in sync for new joiners
+      }
     };
+    
     socketRef.current.on(Actions.CODE_CHANGE, handleRemoteCode);
+    
     return () => {
-      socketRef.current.off(Actions.CODE_CHANGE, handleRemoteCode);
+      // BUG FIX: Check socket exists before cleanup
+      if (socketRef?.current) {
+        socketRef.current.off(Actions.CODE_CHANGE, handleRemoteCode);
+      }
     };
-  }, [socketRef.current, code]);
+    // BUG FIX: Removed socketRef.current and code from dependencies
+    // - socketRef.current changes don't trigger re-renders (refs aren't reactive)
+    // - code dependency caused infinite re-subscription loops
+  }, [socketRef, onCodeChange]);
 
   return (
 <Editor

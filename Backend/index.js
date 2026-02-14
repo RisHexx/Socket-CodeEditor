@@ -58,8 +58,9 @@ io.on("connection", (socket) => {
 
 
   socket.on(Actions.CODE_CHANGE, ({ roomId, code }) => {
-    // socket.in(roomId).emit(Actions.CODE_CHANGE, { code });
-    io.in(roomId).emit(Actions.CODE_CHANGE, { code });
+    // BUG FIX: Use socket.in() instead of io.in() to broadcast to everyone EXCEPT the sender
+    // io.in() sends to ALL clients including sender, causing duplicate updates and potential loops
+    socket.in(roomId).emit(Actions.CODE_CHANGE, { code });
   });
 
   socket.on(Actions.SYNC_CODE, ({ code, socketId }) => {
